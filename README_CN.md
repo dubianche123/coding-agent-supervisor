@@ -1,11 +1,18 @@
-<div align="right">
-  <sub>
-    <a href="README.md">English</a> |
-    <strong>中文</strong>
-  </sub>
-</div>
+<div align="center">
+
+<img src="docs/readme/cover.svg" alt="Loop Warden project overview" width="100%" />
 
 # Loop Warden
+
+**父编排者定义任务边界，辅助程序管理有界执行循环。**
+
+[![License](https://img.shields.io/badge/License-MIT-3A9F82)](LICENSE)
+
+[English](README.md) · **中文**
+
+[快速入口](#先看边界再运行委派) · [使用](#使用) · [质量模式](#质量模式) · [安全边界](#安全边界)
+
+</div>
 
 Loop Warden 是一个 Hermes skill 和本地 Python helper，用来把仓库内的编码任务委派给 Gemini CLI、Codex CLI 这类 AI 编码 CLI。
 
@@ -14,6 +21,18 @@ Loop Warden 是一个 Hermes skill 和本地 Python helper，用来把仓库内�
 **Orchestrator 负责决定任务边界，helper 负责执行循环。**
 
 也就是说，昂贵的父级 agent 不应该盯着每一次实现、测试、review、重试和清理。helper 在本地跑一个有边界的流程，写入结构化产物，并返回一个很小的 JSON brief，方便父级 orchestrator 低成本解析。
+
+## 先看边界，再运行委派
+
+```bash
+git clone https://github.com/dubianche123/bounded-coding-delegation.git
+cd bounded-coding-delegation
+python3 -B scripts/delegate_coding_cli.py --help
+```
+
+`--help` 仅查看入口参数，不启动执行器。实际委派需要已配置的 Gemini CLI 或 Codex CLI，并会在所选工作区执行代码任务。请求格式、质量模式和产物路径见后文。
+
+![工作原理概览](docs/readme/flow-cn.svg)
 
 ## 运行时架构
 

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="430" viewBox="0 0 1280 430" role="img" aria-labelledby="t d">
+<title id="t">Loop Warden</title><desc id="d">Bound the task. Delegate the loop.</desc>
+<rect width="1280" height="430" rx="22" fill="#1D2544"/>
+<path d="M1030 0 1280 250M1155 0l125 125" stroke="#FFFFFF" stroke-opacity=".035" stroke-width="65"/>
+<g font-family="Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<text x="48" y="48" font-size="13" fill="#A5B4FC" font-weight="650" text-anchor="start">BOUNDED CODING DELEGATION</text>
+<text x="48" y="122" font-size="48" fill="#F5F8FF" font-weight="700" text-anchor="start">Loop Warden</text>
+<text x="50" y="164" font-size="21" fill="#C1CFDF" font-weight="400" text-anchor="start">Bound the task. Delegate the loop.</text>
+<rect x="48" y="210" width="352" height="122" rx="14" fill="#FFFFFF" fill-opacity=".055" stroke="#FFFFFF" stroke-opacity=".14"/>
+<text x="68" y="244" font-size="13" fill="#A5B4FC" font-weight="650" text-anchor="start">01 / BOUND</text>
+<text x="68" y="291" font-size="17" fill="#EDF3FA" font-weight="500" text-anchor="start">Task, workspace + policy</text>
+<path d="M413 271h25m-7-5 7 5-7 5" fill="none" stroke="#9DAFC4" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="456" y="210" width="352" height="122" rx="14" fill="#FFFFFF" fill-opacity=".055" stroke="#FFFFFF" stroke-opacity=".14"/>
+<text x="476" y="244" font-size="13" fill="#A5B4FC" font-weight="650" text-anchor="start">02 / EXECUTE</text>
+<text x="476" y="291" font-size="17" fill="#EDF3FA" font-weight="500" text-anchor="start">Implementation, tests + review</text>
+<path d="M821 271h25m-7-5 7 5-7 5" fill="none" stroke="#9DAFC4" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="864" y="210" width="352" height="122" rx="14" fill="#FFFFFF" fill-opacity=".055" stroke="#FFFFFF" stroke-opacity=".14"/>
+<text x="884" y="244" font-size="13" fill="#A5B4FC" font-weight="650" text-anchor="start">03 / HANDOFF</text>
+<text x="884" y="291" font-size="17" fill="#EDF3FA" font-weight="500" text-anchor="start">Brief JSON + detailed artifacts</text>
+<path d="M48 369h1184" stroke="#FFFFFF" stroke-opacity=".14"/>
+<text x="50" y="400" font-size="14" fill="#AFC0D4" font-weight="400" text-anchor="start">Hermes skill + Python helper · Gemini CLI / Codex CLI</text>
+</g></svg>
