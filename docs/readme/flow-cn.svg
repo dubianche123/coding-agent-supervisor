@@ -1,25 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="t d"><title id="t">Loop Warden · 工作原理</title><desc id="d">父编排者决定边界与后续动作；辅助程序不执行推送、合并、部署或发布。</desc>
-<rect x="1" y="1" width="1198" height="298" rx="18" fill="#FAFCFF" stroke="#DCE5F0"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="690" viewBox="0 0 1200 690" role="img" aria-labelledby="title desc">
+<title id="title">Loop Warden · 有界执行与精简交接</title><desc id="desc">Loop Warden · 有界执行与精简交接. Repository-specific technical illustration.</desc>
 <g font-family="Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
-<text x="36" y="42" font-size="24" fill="#253B55" font-weight="650" text-anchor="start">Loop Warden · 工作原理</text>
-<rect x="36" y="97" width="206.4" height="100" rx="12" fill="#ECF3FE" stroke="#95B3DD"/>
-<text x="52.0" y="132" font-size="19" fill="#253B55" font-weight="650" text-anchor="start">请求 JSON</text>
-<text x="52.0" y="163" font-size="13" fill="#60748C" font-weight="400" text-anchor="start">任务与策略</text>
-<path d="M242.4 147H266.4m-6-4 6 4-6 4" stroke="#7186A3" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
-<rect x="266.4" y="97" width="206.4" height="100" rx="12" fill="#E9F5F0" stroke="#88B7A3"/>
-<text x="282.4" y="132" font-size="19" fill="#253B55" font-weight="650" text-anchor="start">受控工作区</text>
-<text x="282.4" y="163" font-size="13" fill="#60748C" font-weight="400" text-anchor="start">校验与加锁</text>
-<path d="M472.8 147H496.8m-6-4 6 4-6 4" stroke="#7186A3" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
-<rect x="496.8" y="97" width="206.4" height="100" rx="12" fill="#ECF3FE" stroke="#95B3DD"/>
-<text x="512.8" y="132" font-size="19" fill="#253B55" font-weight="650" text-anchor="start">执行器 CLI</text>
-<text x="512.8" y="163" font-size="13" fill="#60748C" font-weight="400" text-anchor="start">实现任务</text>
-<path d="M703.2 147H727.2m-6-4 6 4-6 4" stroke="#7186A3" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
-<rect x="727.2" y="97" width="206.4" height="100" rx="12" fill="#E9F5F0" stroke="#88B7A3"/>
-<text x="743.2" y="132" font-size="19" fill="#253B55" font-weight="650" text-anchor="start">有界审核</text>
-<text x="743.2" y="163" font-size="13" fill="#60748C" font-weight="400" text-anchor="start">测试与修复轮次</text>
-<path d="M933.6 147H957.6m-6-4 6 4-6 4" stroke="#7186A3" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
-<rect x="957.6" y="97" width="206.4" height="100" rx="12" fill="#ECF3FE" stroke="#95B3DD"/>
-<text x="973.6" y="132" font-size="19" fill="#253B55" font-weight="650" text-anchor="start">JSON 摘要</text>
-<text x="973.6" y="163" font-size="13" fill="#60748C" font-weight="400" text-anchor="start">产物与升级信号</text>
-<text x="36" y="258" font-size="13" fill="#60748C" font-weight="400" text-anchor="start">父编排者决定边界与后续动作；辅助程序不执行推送、合并、部署或发布。</text>
+<rect x="1" y="1" width="1198" height="688" rx="20" fill="#F8FAFD" stroke="#DBE3ED" />
+<text x="36" y="44" font-size="25" fill="#23324A" font-weight="700" text-anchor="start">父编排者确定契约，辅助程序执行有界循环。</text>
+<rect x="36" y="106" width="284" height="144" rx="14" fill="#EAF1FE" stroke="#9CB4DF" />
+<text x="54" y="138" font-size="20" fill="#23324A" font-weight="700" text-anchor="start">父编排请求</text>
+<text x="54" y="168" font-size="16" fill="#536782" font-weight="400" text-anchor="start">repo · task · executor</text>
+<text x="54" y="192" font-size="16" fill="#536782" font-weight="400" text-anchor="start">workspace_mode · quality_mode</text>
+<text x="54" y="216" font-size="16" fill="#536782" font-weight="400" text-anchor="start">超时与修复预算</text>
+<rect x="458" y="106" width="284" height="144" rx="14" fill="#E7F5EF" stroke="#93C8B0" />
+<text x="476" y="138" font-size="20" fill="#23324A" font-weight="700" text-anchor="start">工作区与执行器</text>
+<text x="476" y="168" font-size="16" fill="#536782" font-weight="400" text-anchor="start">校验并获取工作区锁</text>
+<text x="476" y="192" font-size="16" fill="#536782" font-weight="400" text-anchor="start">通过所选 CLI 实现任务</text>
+<text x="476" y="216" font-size="16" fill="#536782" font-weight="400" text-anchor="start">跟踪子进程组</text>
+<rect x="880" y="106" width="284" height="144" rx="14" fill="#F0EAFC" stroke="#B7A2D7" />
+<text x="898" y="138" font-size="20" fill="#23324A" font-weight="700" text-anchor="start">测试与审核策略</text>
+<text x="898" y="168" font-size="16" fill="#536782" font-weight="400" text-anchor="start">适用时运行检测到的测试</text>
+<text x="898" y="192" font-size="16" fill="#536782" font-weight="400" text-anchor="start">阶段审核 / 最终审核</text>
+<text x="898" y="216" font-size="16" fill="#536782" font-weight="400" text-anchor="start">一次确定 fast / safe 策略</text>
+<path d="M320 176H458m-7 -5 7 5 -7 5" fill="none" stroke="#6E809A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M742 176H880m-7 -5 7 5 -7 5" fill="none" stroke="#6E809A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M595 257l5-7 5 7" fill="none" stroke="#A68345" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M1022 250V318H600V250" fill="none" stroke="#A68345" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="666" y="303" font-size="16" fill="#8B6D35" font-weight="400" text-anchor="start">有可执行问题，且仍有修复预算</text>
+<rect x="880" y="379" width="284" height="125" rx="14" fill="#FFF3DD" stroke="#D9BD83" />
+<text x="898" y="411" font-size="20" fill="#23324A" font-weight="700" text-anchor="start">停止并返回</text>
+<text x="898" y="441" font-size="16" fill="#536782" font-weight="400" text-anchor="start">passed / needs_escalation</text>
+<text x="898" y="465" font-size="16" fill="#536782" font-weight="400" text-anchor="start">由父编排者决定后续</text>
+<path d="M1022 250V379m-5 -7 5 7 5 -7" fill="none" stroke="#87749C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 6"/>
+<rect x="36" y="379" width="284" height="125" rx="14" fill="#E7F5EF" stroke="#93C8B0" />
+<text x="54" y="411" font-size="20" fill="#23324A" font-weight="700" text-anchor="start">stdout · 精简 JSON</text>
+<text x="54" y="441" font-size="16" fill="#536782" font-weight="400" text-anchor="start">状态与产物路径</text>
+<text x="54" y="465" font-size="16" fill="#536782" font-weight="400" text-anchor="start">供上层解析的响应</text>
+<rect x="458" y="379" width="284" height="125" rx="14" fill="#EAF1FE" stroke="#9CB4DF" />
+<text x="476" y="411" font-size="20" fill="#23324A" font-weight="700" text-anchor="start">磁盘 · 完整产物</text>
+<text x="476" y="441" font-size="16" fill="#536782" font-weight="400" text-anchor="start">summary.json · handoff.json</text>
+<text x="476" y="465" font-size="16" fill="#536782" font-weight="400" text-anchor="start">提示词、测试、日志与差异</text>
+<path d="M880 443H742m7 -5 -7 5 7 5" fill="none" stroke="#6E809A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M458 443H320m7 -5 -7 5 7 5" fill="none" stroke="#6E809A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="36" y="558" width="1128" height="84" rx="14" fill="#EEF2F8" stroke="#BAC8D9" />
+<text x="57" y="590" font-size="19" fill="#23324A" font-weight="650" text-anchor="start">stderr 输出进度心跳；中断与超时触发进程组清理。</text>
+<text x="57" y="620" font-size="16" fill="#60728A" font-weight="400" text-anchor="start">有界辅助程序不是操作系统沙箱；工作区选择与模型权限仍需明确。</text>
 </g></svg>

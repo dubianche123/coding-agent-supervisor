@@ -10,7 +10,7 @@
 
 **English** · [中文](README_CN.md)
 
-[Start here](#inspect-before-delegating) · [Usage](#usage) · [Quality modes](#quality-modes) · [Safety](#safety-boundaries)
+[Try the entrypoint](#inspect-before-delegating) · [Request contract](#a-task-contract-before-an-executor) · [Quality modes](#quality-modes) · [Handoff](#two-tier-handoff)
 
 </div>
 
@@ -32,11 +32,44 @@ python3 -B scripts/delegate_coding_cli.py --help
 
 `--help` inspects the entrypoint without starting an executor. Real delegation requires a configured Gemini CLI or Codex CLI and performs coding work in the selected workspace. The request contract, quality policies and artifact paths are documented below.
 
-![How it works](docs/readme/flow.svg)
+## A task contract before an executor
+
+A useful delegation is more than a task sentence. It needs a concrete repository, a workspace strategy, an executor, a review policy and a stopping point. The parent supplies those choices; the helper owns the mechanical loop and reports whether it finished or exhausted its boundary.
+
+For example, save this as `/tmp/delegate-request.json`, replacing the repository path with your own task workspace:
+
+```json
+{
+  "repo": "/absolute/path/to/task-repo",
+  "task": "Fix the login loading state after a failed request; add a focused regression check.",
+  "executor": "gemini",
+  "mode": "implement",
+  "workspace_mode": "direct",
+  "quality_mode": "safe",
+  "stdout_mode": "brief",
+  "timeout": 1800,
+  "max_fixup_rounds": 2
+}
+```
+
+```bash
+python3 -B scripts/delegate_coding_cli.py --request-json /tmp/delegate-request.json
+```
+
+This starts real coding work and configured model calls. `direct` edits the supplied repository; `worktree` and `copy` select other workspace strategies. The helper is a process/workflow controller, not an OS sandbox. CLI arguments take precedence when that argument supplies a value; consult `--help` and `normalize_request()` for the exact current request handling.
+
+| Parent decides | Helper enforces | Parent receives |
+| --- | --- | --- |
+| Task and repository | Path validation and workspace lock | Selected workspace and artifact paths |
+| Executor and quality mode | Tests/review policy and subprocess lifecycle | Results, findings and attempt records |
+| Timeout and fixup budget | Bounded retries and cleanup | `passed` or a follow-up/escalation signal |
+| What to do with the diff | No automatic push, merge or deployment | A small brief with details available on disk |
 
 ## Runtime Architecture
 
-![Loop Warden C4 runtime flow](docs/c4-delegation-flow.svg)
+![Bounded execution loop and output channels](docs/readme/flow.svg)
+
+[Detailed C4 runtime view](docs/c4-delegation-flow.svg)
 
 This C4-style diagram separates three responsibilities:
 
@@ -66,6 +99,15 @@ The helper separates responsibilities:
 - **Step review**: defaults to `gemini-3.1-flash-lite-preview` for routine checks and fixup decisions.
 - **Final review**: safe mode uses `gemini-3.1-pro-preview`; fast mode starts lighter and escalates only when risk warrants it.
 - **Parent escalation**: when fixup attempts are exhausted and review still fails, the helper does not auto-upgrade itself. It returns `needs_escalation` so Hermes can resubmit with a stronger model.
+
+## Reading the result without reading every log
+
+1. Parse stdout as JSON. Check `success`, `handoff_status`, `followup_required` and `escalation_required`.
+2. If the run passed, inspect the reported changed files and the relevant test/review evidence.
+3. If it returned `needs_escalation`, read the findings and attempt history, then let the parent decide whether to retry with a stronger executor or narrow the task.
+4. Read full logs only for the stage that needs diagnosis; stderr heartbeats are progress, not the final result.
+
+A `passed` handoff records the helper's execution/review outcome. It is not proof that the change has been merged, deployed, or validated under every environment.
 
 ## Runtime Pipeline
 
@@ -314,6 +356,21 @@ The helper is conservative by design:
 - It writes prompts to files and invokes subprocesses without shell interpolation.
 - It uses workspace locks to avoid concurrent helper runs in the same workspace.
 - It tracks child process groups and cleans them up on timeout, interrupt, and shutdown.
+
+## Explore the implementation
+
+The repository is intentionally small. In [delegate_coding_cli.py](scripts/delegate_coding_cli.py), follow these functions rather than reading every log-handling branch first:
+
+| Function | Question it answers |
+| --- | --- |
+| `normalize_request()` | Which request values and defaults will this run use? |
+| `resolve_quality_mode()` | How does `auto` become `fast` or `safe`? |
+| `create_workspace()` / `acquire_workspace_lock()` | Where can work happen, and how is concurrent ownership controlled? |
+| `run_implementation_round()` / `run_final_review_round()` | Which execution/review calls are made? |
+| `terminate_process_group()` / `cleanup_active_processes()` | What survives a timeout or interrupt? |
+| `build_orchestrator_brief()` / `build_handoff_section()` | What does the parent read first, and how does it fetch details? |
+
+The [SKILL.md](SKILL.md) wrapper explains how Hermes should choose and invoke the helper. The execution engine itself is a Python entrypoint; other orchestrators can reuse the request/brief contract.
 
 ## Repository Layout
 

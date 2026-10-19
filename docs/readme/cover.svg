@@ -1,22 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="430" viewBox="0 0 1280 430" role="img" aria-labelledby="t d">
-<title id="t">Loop Warden</title><desc id="d">Bound the task. Delegate the loop.</desc>
-<rect width="1280" height="430" rx="22" fill="#1D2544"/>
-<path d="M1030 0 1280 250M1155 0l125 125" stroke="#FFFFFF" stroke-opacity=".035" stroke-width="65"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="520" viewBox="0 0 1280 520" role="img" aria-labelledby="title desc">
+<title id="title">Loop Warden</title><desc id="desc">Loop Warden. Repository-specific technical illustration.</desc>
+<defs><linearGradient id="project-bg" x2="1" y2="1"><stop stop-color="#1C2435"/><stop offset="1" stop-color="#302735"/></linearGradient><pattern id="texture" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#FFFFFF" fill-opacity=".035"/></pattern></defs>
 <g font-family="Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
-<text x="48" y="48" font-size="13" fill="#A5B4FC" font-weight="650" text-anchor="start">BOUNDED CODING DELEGATION</text>
-<text x="48" y="122" font-size="48" fill="#F5F8FF" font-weight="700" text-anchor="start">Loop Warden</text>
-<text x="50" y="164" font-size="21" fill="#C1CFDF" font-weight="400" text-anchor="start">Bound the task. Delegate the loop.</text>
-<rect x="48" y="210" width="352" height="122" rx="14" fill="#FFFFFF" fill-opacity=".055" stroke="#FFFFFF" stroke-opacity=".14"/>
-<text x="68" y="244" font-size="13" fill="#A5B4FC" font-weight="650" text-anchor="start">01 / BOUND</text>
-<text x="68" y="291" font-size="17" fill="#EDF3FA" font-weight="500" text-anchor="start">Task, workspace + policy</text>
-<path d="M413 271h25m-7-5 7 5-7 5" fill="none" stroke="#9DAFC4" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-<rect x="456" y="210" width="352" height="122" rx="14" fill="#FFFFFF" fill-opacity=".055" stroke="#FFFFFF" stroke-opacity=".14"/>
-<text x="476" y="244" font-size="13" fill="#A5B4FC" font-weight="650" text-anchor="start">02 / EXECUTE</text>
-<text x="476" y="291" font-size="17" fill="#EDF3FA" font-weight="500" text-anchor="start">Implementation, tests + review</text>
-<path d="M821 271h25m-7-5 7 5-7 5" fill="none" stroke="#9DAFC4" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-<rect x="864" y="210" width="352" height="122" rx="14" fill="#FFFFFF" fill-opacity=".055" stroke="#FFFFFF" stroke-opacity=".14"/>
-<text x="884" y="244" font-size="13" fill="#A5B4FC" font-weight="650" text-anchor="start">03 / HANDOFF</text>
-<text x="884" y="291" font-size="17" fill="#EDF3FA" font-weight="500" text-anchor="start">Brief JSON + detailed artifacts</text>
-<path d="M48 369h1184" stroke="#FFFFFF" stroke-opacity=".14"/>
-<text x="50" y="400" font-size="14" fill="#AFC0D4" font-weight="400" text-anchor="start">Hermes skill + Python helper · Gemini CLI / Codex CLI</text>
+<rect x="1" y="1" width="1278" height="518" rx="20" fill="url(#project-bg)" stroke="#283951" />
+<rect x="1" y="1" width="1278" height="518" rx="20" fill="url(#texture)"/>
+<path d="M59 32H77V49H54V40m-5 5 5-5 5 5M60 37h10" fill="none" stroke="#F5BF84" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M0 430H1280M640 0V520" fill="none" stroke="#25354F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="88" y="49" font-size="13" fill="#F5BF84" font-weight="700" text-anchor="start">BOUND THE TASK. DELEGATE THE LOOP.</text>
+<text x="50" y="132" font-size="45" fill="#F7FAFF" font-weight="700" text-anchor="start">Loop Warden</text>
+<text x="52" y="190" font-size="22" fill="#C2CFE1" font-weight="400" text-anchor="start">A small contract for</text>
+<text x="52" y="223" font-size="22" fill="#C2CFE1" font-weight="400" text-anchor="start">repository-local coding work.</text>
+<text x="52" y="350" font-size="17" fill="#8EA4BF" font-weight="400" text-anchor="start">— The parent chooses scope and policy.</text>
+<text x="52" y="379" font-size="17" fill="#8EA4BF" font-weight="400" text-anchor="start">— The helper owns bounded execution.</text>
+<text x="52" y="408" font-size="17" fill="#8EA4BF" font-weight="400" text-anchor="start">— Detailed artifacts stay available on demand.</text>
+<text x="52" y="486" font-size="12" fill="#6F86A4" font-weight="700" text-anchor="start">PROJECT OVERVIEW  /  SCHEMATIC</text>
+<rect x="699" y="65" width="524" height="95" rx="14" fill="#17263D" stroke="#364A66" />
+<text x="717" y="96" font-size="17" fill="#F5BF84" font-weight="700" text-anchor="start">PARENT REQUEST</text>
+<text x="717" y="126" font-size="16" fill="#DFE8F5" font-weight="400" text-anchor="start">task  ·  workspace  ·  quality_mode  ·  retry budget</text>
+<path d="M961 160V207m-5 -7 5 7 5 -7" fill="none" stroke="#F5BF84" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="699" y="218" width="524" height="117" rx="14" fill="#17263D" stroke="#364A66" />
+<text x="717" y="249" font-size="17" fill="#F5BF84" font-weight="700" text-anchor="start">BOUNDED EXECUTION</text>
+<text x="717" y="279" font-size="16" fill="#DFE8F5" font-weight="400" text-anchor="start">Implement → test → review → fix if budget remains</text>
+<text x="717" y="303" font-size="16" fill="#DFE8F5" font-weight="400" text-anchor="start">Stop at the limit; return needs_escalation.</text>
+<path d="M961 335V382m-5 -7 5 7 5 -7" fill="none" stroke="#F5BF84" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="699" y="393" width="249" height="76" rx="14" fill="#193B36" stroke="#4B7C6C" />
+<text x="716" y="423" font-size="14" fill="#F5BF84" font-weight="700" text-anchor="start">stdout</text>
+<text x="716" y="448" font-size="17" fill="#E4F5EF" font-weight="400" text-anchor="start">Compact JSON brief</text>
+<rect x="971" y="393" width="252" height="76" rx="14" fill="#29273F" stroke="#666183" />
+<text x="988" y="423" font-size="14" fill="#BFB5F1" font-weight="700" text-anchor="start">disk</text>
+<text x="988" y="448" font-size="17" fill="#ECE7FA" font-weight="400" text-anchor="start">Logs + full handoff</text>
 </g></svg>

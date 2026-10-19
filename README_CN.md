@@ -10,7 +10,7 @@
 
 [English](README.md) · **中文**
 
-[快速入口](#先看边界再运行委派) · [使用](#使用) · [质量模式](#质量模式) · [安全边界](#安全边界)
+[查看入口](#先看边界再运行委派) · [任务契约](#先有任务契约再启动执行器) · [质量模式](#质量模式) · [交接](#两级交接)
 
 </div>
 
@@ -32,11 +32,44 @@ python3 -B scripts/delegate_coding_cli.py --help
 
 `--help` 仅查看入口参数，不启动执行器。实际委派需要已配置的 Gemini CLI 或 Codex CLI，并会在所选工作区执行代码任务。请求格式、质量模式和产物路径见后文。
 
-![工作原理概览](docs/readme/flow-cn.svg)
+## 先有任务契约，再启动执行器
+
+有用的委派不只是一句任务描述，还需要具体仓库、工作区策略、执行器、审核方式与停止边界。父编排者提供这些选择，辅助程序执行机械循环，并报告完成情况或边界耗尽原因。
+
+例如，将以下内容保存为 `/tmp/delegate-request.json`，把仓库路径换成自己的任务工作区：
+
+```json
+{
+  "repo": "/absolute/path/to/task-repo",
+  "task": "修复请求失败后的登录加载状态，并加入一个聚焦的回归检查。",
+  "executor": "gemini",
+  "mode": "implement",
+  "workspace_mode": "direct",
+  "quality_mode": "safe",
+  "stdout_mode": "brief",
+  "timeout": 1800,
+  "max_fixup_rounds": 2
+}
+```
+
+```bash
+python3 -B scripts/delegate_coding_cli.py --request-json /tmp/delegate-request.json
+```
+
+这会启动真实代码修改与配置的模型调用。`direct` 修改传入仓库；`worktree` 和 `copy` 提供其他工作区策略。它是进程/工作流控制器，不是操作系统沙箱。某个 CLI 参数提供值时会优先采用；当前精确处理规则见 `--help` 与 `normalize_request()`。
+
+| 父编排者决定 | 辅助程序约束 | 上层收到什么 |
+| --- | --- | --- |
+| 任务与仓库 | 路径校验与工作区锁 | 实际工作区与产物路径 |
+| 执行器与质量模式 | 测试/审核策略与子进程生命周期 | 结果、问题与尝试记录 |
+| 超时与修复预算 | 有界重试与清理 | `passed` 或后续处理/升级信号 |
+| 如何处理差异 | 不自动推送、合并或部署 | 精简摘要，磁盘上保留完整细节 |
 
 ## 运行时架构
 
-![Loop Warden C4 运行时架构图](docs/c4-delegation-flow.svg)
+![有界执行与输出通道](docs/readme/flow-cn.svg)
+
+[详细 C4 运行时视图](docs/c4-delegation-flow.svg)
 
 这张 C4 风格图把三层职责分开：
 
@@ -66,6 +99,15 @@ helper 把职责拆开：
 - **step review**：默认使用 `gemini-3.1-flash-lite-preview`，用于常规检查和 fixup 决策。
 - **final review**：safe mode 使用 `gemini-3.1-pro-preview`；fast mode 先走轻量路径，只有风险足够时才升级。
 - **父级升级**：如果 fixup 次数耗尽但 review 仍失败，helper 不会自己升级模型，而是返回 `needs_escalation`，让 Hermes 用更强模型重新提交。
+
+## 不读全量日志，怎样接住结果
+
+1. 将 stdout 按 JSON 解析，先看 `success`、`handoff_status`、`followup_required` 和 `escalation_required`。
+2. 通过时，检查返回的变更文件与相关测试/审核证据。
+3. 返回 `needs_escalation` 时，读取问题和尝试历史，再由父编排者决定增强执行器，还是缩小任务。
+4. 只读取需要诊断的阶段日志；stderr 心跳代表进度，不是最终结果。
+
+`passed` 记录的是辅助程序的执行/审核结论，不表示变更已经合并、部署，或在所有环境下完成验证。
 
 ## 执行流程
 
@@ -314,6 +356,21 @@ helper 默认保守运行：
 - prompt 先写入文件，再用 subprocess 调用，不拼 shell 字符串。
 - 使用 workspace lock，避免两个 helper 同时改同一个 workspace。
 - 跟踪子进程组，并在 timeout、interrupt、shutdown 时清理。
+
+## 从实现看执行边界
+
+仓库刻意保持很小。阅读 [delegate_coding_cli.py](scripts/delegate_coding_cli.py) 时，可以按这些函数定位职责：
+
+| 函数 | 回答什么问题 |
+| --- | --- |
+| `normalize_request()` | 请求中的哪些值和默认值实际生效？ |
+| `resolve_quality_mode()` | `auto` 怎样确定为 `fast` 或 `safe`？ |
+| `create_workspace()` / `acquire_workspace_lock()` | 工作在哪里执行，并发占用如何控制？ |
+| `run_implementation_round()` / `run_final_review_round()` | 哪些实现与审核调用会发生？ |
+| `terminate_process_group()` / `cleanup_active_processes()` | 超时和中断后怎样清理子进程？ |
+| `build_orchestrator_brief()` / `build_handoff_section()` | 上层先读什么，怎样按需读取详情？ |
+
+[SKILL.md](SKILL.md) 是 Hermes 选择与调用该工具的包装说明；执行引擎本身是 Python 入口，其他编排者可以复用请求与摘要契约。
 
 ## 仓库结构
 

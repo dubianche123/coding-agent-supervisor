@@ -1,25 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="t d"><title id="t">Loop Warden · How it works</title><desc id="d">The parent chooses the boundary and follow-up. The helper does not push, merge, deploy, or publish.</desc>
-<rect x="1" y="1" width="1198" height="298" rx="18" fill="#FAFCFF" stroke="#DCE5F0"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="690" viewBox="0 0 1200 690" role="img" aria-labelledby="title desc">
+<title id="title">Loop Warden · Bounded execution and a small handoff</title><desc id="desc">Loop Warden · Bounded execution and a small handoff. Repository-specific technical illustration.</desc>
 <g font-family="Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
-<text x="36" y="42" font-size="24" fill="#253B55" font-weight="650" text-anchor="start">Loop Warden · How it works</text>
-<rect x="36" y="97" width="206.4" height="100" rx="12" fill="#ECF3FE" stroke="#95B3DD"/>
-<text x="52.0" y="132" font-size="19" fill="#253B55" font-weight="650" text-anchor="start">Request JSON</text>
-<text x="52.0" y="163" font-size="13" fill="#60748C" font-weight="400" text-anchor="start">Task + policy</text>
-<path d="M242.4 147H266.4m-6-4 6 4-6 4" stroke="#7186A3" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
-<rect x="266.4" y="97" width="206.4" height="100" rx="12" fill="#E9F5F0" stroke="#88B7A3"/>
-<text x="282.4" y="132" font-size="19" fill="#253B55" font-weight="650" text-anchor="start">Workspace</text>
-<text x="282.4" y="163" font-size="13" fill="#60748C" font-weight="400" text-anchor="start">Validate + lock</text>
-<path d="M472.8 147H496.8m-6-4 6 4-6 4" stroke="#7186A3" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
-<rect x="496.8" y="97" width="206.4" height="100" rx="12" fill="#ECF3FE" stroke="#95B3DD"/>
-<text x="512.8" y="132" font-size="19" fill="#253B55" font-weight="650" text-anchor="start">Executor CLI</text>
-<text x="512.8" y="163" font-size="13" fill="#60748C" font-weight="400" text-anchor="start">Implementation</text>
-<path d="M703.2 147H727.2m-6-4 6 4-6 4" stroke="#7186A3" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
-<rect x="727.2" y="97" width="206.4" height="100" rx="12" fill="#E9F5F0" stroke="#88B7A3"/>
-<text x="743.2" y="132" font-size="19" fill="#253B55" font-weight="650" text-anchor="start">Bounded review</text>
-<text x="743.2" y="163" font-size="13" fill="#60748C" font-weight="400" text-anchor="start">Tests + fixup limits</text>
-<path d="M933.6 147H957.6m-6-4 6 4-6 4" stroke="#7186A3" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
-<rect x="957.6" y="97" width="206.4" height="100" rx="12" fill="#ECF3FE" stroke="#95B3DD"/>
-<text x="973.6" y="132" font-size="19" fill="#253B55" font-weight="650" text-anchor="start">JSON brief</text>
-<text x="973.6" y="163" font-size="13" fill="#60748C" font-weight="400" text-anchor="start">Artifacts + escalation</text>
-<text x="36" y="258" font-size="13" fill="#60748C" font-weight="400" text-anchor="start">The parent chooses the boundary and follow-up. The helper does not push, merge, deploy, or publish.</text>
+<rect x="1" y="1" width="1198" height="688" rx="20" fill="#F8FAFD" stroke="#DBE3ED" />
+<text x="36" y="44" font-size="25" fill="#23324A" font-weight="700" text-anchor="start">The parent sets the contract. The helper runs the bounded loop.</text>
+<rect x="36" y="106" width="284" height="144" rx="14" fill="#EAF1FE" stroke="#9CB4DF" />
+<text x="54" y="138" font-size="20" fill="#23324A" font-weight="700" text-anchor="start">Parent request</text>
+<text x="54" y="168" font-size="16" fill="#536782" font-weight="400" text-anchor="start">repo · task · executor</text>
+<text x="54" y="192" font-size="16" fill="#536782" font-weight="400" text-anchor="start">workspace_mode · quality_mode</text>
+<text x="54" y="216" font-size="16" fill="#536782" font-weight="400" text-anchor="start">Timeout + fixup budget</text>
+<rect x="458" y="106" width="284" height="144" rx="14" fill="#E7F5EF" stroke="#93C8B0" />
+<text x="476" y="138" font-size="20" fill="#23324A" font-weight="700" text-anchor="start">Workspace + executor</text>
+<text x="476" y="168" font-size="16" fill="#536782" font-weight="400" text-anchor="start">Validate + acquire lock</text>
+<text x="476" y="192" font-size="16" fill="#536782" font-weight="400" text-anchor="start">Implement with selected CLI</text>
+<text x="476" y="216" font-size="16" fill="#536782" font-weight="400" text-anchor="start">Track child process groups</text>
+<rect x="880" y="106" width="284" height="144" rx="14" fill="#F0EAFC" stroke="#B7A2D7" />
+<text x="898" y="138" font-size="20" fill="#23324A" font-weight="700" text-anchor="start">Tests + review policy</text>
+<text x="898" y="168" font-size="16" fill="#536782" font-weight="400" text-anchor="start">Detected tests where applicable</text>
+<text x="898" y="192" font-size="16" fill="#536782" font-weight="400" text-anchor="start">Step review / final review</text>
+<text x="898" y="216" font-size="16" fill="#536782" font-weight="400" text-anchor="start">Resolve fast or safe once</text>
+<path d="M320 176H458m-7 -5 7 5 -7 5" fill="none" stroke="#6E809A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M742 176H880m-7 -5 7 5 -7 5" fill="none" stroke="#6E809A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M595 257l5-7 5 7" fill="none" stroke="#A68345" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M1022 250V318H600V250" fill="none" stroke="#A68345" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="666" y="303" font-size="16" fill="#8B6D35" font-weight="400" text-anchor="start">Actionable findings + remaining fixups</text>
+<rect x="880" y="379" width="284" height="125" rx="14" fill="#FFF3DD" stroke="#D9BD83" />
+<text x="898" y="411" font-size="20" fill="#23324A" font-weight="700" text-anchor="start">Stop + return</text>
+<text x="898" y="441" font-size="16" fill="#536782" font-weight="400" text-anchor="start">passed / needs_escalation</text>
+<text x="898" y="465" font-size="16" fill="#536782" font-weight="400" text-anchor="start">Parent chooses the next step</text>
+<path d="M1022 250V379m-5 -7 5 7 5 -7" fill="none" stroke="#87749C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 6"/>
+<rect x="36" y="379" width="284" height="125" rx="14" fill="#E7F5EF" stroke="#93C8B0" />
+<text x="54" y="411" font-size="20" fill="#23324A" font-weight="700" text-anchor="start">stdout · brief JSON</text>
+<text x="54" y="441" font-size="16" fill="#536782" font-weight="400" text-anchor="start">Status + artifact paths</text>
+<text x="54" y="465" font-size="16" fill="#536782" font-weight="400" text-anchor="start">Machine-parseable response</text>
+<rect x="458" y="379" width="284" height="125" rx="14" fill="#EAF1FE" stroke="#9CB4DF" />
+<text x="476" y="411" font-size="20" fill="#23324A" font-weight="700" text-anchor="start">disk · detailed artifacts</text>
+<text x="476" y="441" font-size="16" fill="#536782" font-weight="400" text-anchor="start">summary.json · handoff.json</text>
+<text x="476" y="465" font-size="16" fill="#536782" font-weight="400" text-anchor="start">Prompts / tests / logs / diff</text>
+<path d="M880 443H742m7 -5 -7 5 7 5" fill="none" stroke="#6E809A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M458 443H320m7 -5 -7 5 7 5" fill="none" stroke="#6E809A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="36" y="558" width="1128" height="84" rx="14" fill="#EEF2F8" stroke="#BAC8D9" />
+<text x="57" y="590" font-size="19" fill="#23324A" font-weight="650" text-anchor="start">stderr carries heartbeats. Interrupts and timeouts trigger process-group cleanup.</text>
+<text x="57" y="620" font-size="16" fill="#60728A" font-weight="400" text-anchor="start">A bounded helper is not an OS sandbox. Workspace selection and model permissions still matter.</text>
 </g></svg>
