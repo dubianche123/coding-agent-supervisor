@@ -2,7 +2,7 @@
 
 <img src="docs/readme/cover.svg" alt="Loop Warden project overview" width="100%" />
 
-# Loop Warden
+# Loop Warden · Bounded AI Coding Delegation
 
 **The parent defines the boundary; the helper owns the bounded execution loop.**
 
@@ -14,6 +14,8 @@
 
 </div>
 
+**中文简介：为 Hermes 和本地智能体编排者提供有界 AI 编码委派，将 Gemini CLI / Codex CLI 的实现、审核、修复与进程清理收敛成结构化交接。** [中文说明](README_CN.md)
+
 Loop Warden is a Hermes skill and local Python helper for delegating repository-local coding work to AI coding CLIs such as Gemini CLI and Codex CLI.
 
 It is built around one principle:
@@ -21,6 +23,8 @@ It is built around one principle:
 **The orchestrator chooses the task boundary. The helper owns the execution loop.**
 
 That means the expensive parent agent should not babysit every implementation, test, review, retry, and cleanup step. The helper runs a bounded local workflow, writes structured artifacts, and returns a tiny JSON brief that the parent orchestrator can parse cheaply.
+
+For developers building local coding-agent orchestration who need a bounded execution helper and a small machine-readable handoff. [Inspect the CLI](#inspect-before-delegating) without starting a model, then follow the [request contract](#a-task-contract-before-an-executor) for a real task.
 
 ## Inspect before delegating
 

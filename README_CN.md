@@ -2,7 +2,7 @@
 
 <img src="docs/readme/cover.svg" alt="Loop Warden project overview" width="100%" />
 
-# Loop Warden
+# Loop Warden · 有界 AI 编码委派
 
 **父编排者定义任务边界，辅助程序管理有界执行循环。**
 
@@ -21,6 +21,8 @@ Loop Warden 是一个 Hermes skill 和本地 Python helper，用来把仓库内�
 **Orchestrator 负责决定任务边界，helper 负责执行循环。**
 
 也就是说，昂贵的父级 agent 不应该盯着每一次实现、测试、review、重试和清理。helper 在本地跑一个有边界的流程，写入结构化产物，并返回一个很小的 JSON brief，方便父级 orchestrator 低成本解析。
+
+适合搭建本地编码智能体工作流、希望复用实现—审核—修复循环的开发者。先[查看 CLI 参数](#先看边界再运行委派)，无需启动模型；再按[任务契约](#先有任务契约再启动执行器)接入真实编码任务。
 
 ## 先看边界，再运行委派
 
