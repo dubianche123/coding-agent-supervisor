@@ -8,13 +8,11 @@
 
 [![License](https://img.shields.io/badge/License-MIT-3A9F82)](LICENSE)
 
-**English** · [中文](README_CN.md)
+**English** · [简体中文](README_CN.md)
 
 [Try the entrypoint](#inspect-before-delegating) · [Request contract](#a-task-contract-before-an-executor) · [Quality modes](#quality-modes) · [Handoff](#two-tier-handoff)
 
 </div>
-
-**中文简介：为 Hermes 和本地智能体编排者提供有界 AI 编码委派，将 Gemini CLI / Codex CLI 的实现、审核、修复与进程清理收敛成结构化交接。** [中文说明](README_CN.md)
 
 Loop Warden is a Hermes skill and local Python helper for delegating repository-local coding work to AI coding CLIs such as Gemini CLI and Codex CLI.
 
@@ -29,8 +27,8 @@ For developers building local coding-agent orchestration who need a bounded exec
 ## Inspect before delegating
 
 ```bash
-git clone https://github.com/dubianche123/bounded-coding-delegation.git
-cd bounded-coding-delegation
+git clone https://github.com/dubianche123/coding-agent-supervisor.git
+cd coding-agent-supervisor
 python3 -B scripts/delegate_coding_cli.py --help
 ```
 

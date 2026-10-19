@@ -8,7 +8,7 @@
 
 [![License](https://img.shields.io/badge/License-MIT-3A9F82)](LICENSE)
 
-[English](README.md) · **中文**
+[English](README.md) · **简体中文**
 
 [查看入口](#先看边界再运行委派) · [任务契约](#先有任务契约再启动执行器) · [质量模式](#质量模式) · [交接](#两级交接)
 
@@ -27,8 +27,8 @@ Loop Warden 是一个 Hermes skill 和本地 Python helper，用来把仓库内�
 ## 先看边界，再运行委派
 
 ```bash
-git clone https://github.com/dubianche123/bounded-coding-delegation.git
-cd bounded-coding-delegation
+git clone https://github.com/dubianche123/coding-agent-supervisor.git
+cd coding-agent-supervisor
 python3 -B scripts/delegate_coding_cli.py --help
 ```
 
