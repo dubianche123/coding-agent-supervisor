@@ -10,35 +10,34 @@
 
 **English** · [简体中文](README_CN.md)
 
-[Try the entrypoint](#inspect-before-delegating) · [Request contract](#a-task-contract-before-an-executor) · [Quality modes](#quality-modes) · [Handoff](#two-tier-handoff)
+[Try the entrypoint](#quick-look-no-model-calls) · [Request contract](#a-task-contract-before-an-executor) · [Quality modes](#quality-modes) · [Handoff](#two-tier-handoff)
 
 </div>
 
-Loop Warden is a Hermes skill and local Python helper for delegating repository-local coding work to AI coding CLIs such as Gemini CLI and Codex CLI.
+If you've ever wired a top-level agent (like Hermes) to spawn local coding CLIs (`gemini`, `codex`), you run into the same unglamorous failures pretty quickly:
 
-It is built around one principle:
+1. **Orphan processes**: a child CLI hangs on a pipe or times out, and its subprocess group keeps running in the background.
+2. **Context bloat**: the child dumps 7,000+ tokens of raw implementation logs, test output, and review diffs straight back into the parent orchestrator's context window.
+3. **Infinite fixup loops**: a fast model fails the same review check three times in a row, burning tokens without making progress while the parent agent has no idea whether to step in.
 
-**The orchestrator chooses the task boundary. The helper owns the execution loop.**
+**Loop Warden** (`delegate_coding_cli.py`) is the supervisor script extracted from my daily Hermes setup to keep that local loop on a short leash: **the parent orchestrator defines the task contract; the helper owns the mechanical implement → test → review → fixup loop**. When it finishes (or hits its retry ceiling), it prints a ~320-token JSON brief to `stdout` and leaves the heavy logs on disk for on-demand inspection.
 
-That means the expensive parent agent should not babysit every implementation, test, review, retry, and cleanup step. The helper runs a bounded local workflow, writes structured artifacts, and returns a tiny JSON brief that the parent orchestrator can parse cheaply.
-
-For developers building local coding-agent orchestration who need a bounded execution helper and a small machine-readable handoff. [Inspect the CLI](#inspect-before-delegating) without starting a model, then follow the [request contract](#a-task-contract-before-an-executor) for a real task.
-
-## Inspect before delegating
+## Quick look (no model calls)
 
 ```bash
 git clone https://github.com/dubianche123/coding-agent-supervisor.git
 cd coding-agent-supervisor
 python3 -B scripts/delegate_coding_cli.py --help
+python3 -B scripts/delegate_coding_cli.py --check-health
 ```
 
-`--help` inspects the entrypoint without starting an executor. Real delegation requires a configured Gemini CLI or Codex CLI and performs coding work in the selected workspace. The request contract, quality policies and artifact paths are documented below.
+`--help` inspects the CLI contract and `--check-health` reports active child process counts and workspace locks without starting any model.
 
 ## A task contract before an executor
 
-A useful delegation is more than a task sentence. It needs a concrete repository, a workspace strategy, an executor, a review policy and a stopping point. The parent supplies those choices; the helper owns the mechanical loop and reports whether it finished or exhausted its boundary.
+Instead of handing a sub-agent a vague one-liner, the parent passes an explicit request contract—target repository, workspace isolation strategy (`direct`, `worktree`, or `copy`), executor (`gemini` or `codex`), review policy (`auto`, `fast`, or `safe`), and a hard fixup budget (`max_fixup_rounds`).
 
-For example, save this as `/tmp/delegate-request.json`, replacing the repository path with your own task workspace:
+Save this as `/tmp/delegate-request.json` (pointing `repo` at a real Git repository with at least one commit):
 
 ```json
 {
@@ -58,14 +57,12 @@ For example, save this as `/tmp/delegate-request.json`, replacing the repository
 python3 -B scripts/delegate_coding_cli.py --request-json /tmp/delegate-request.json
 ```
 
-This starts real coding work and configured model calls. `direct` edits the supplied repository; `worktree` and `copy` select other workspace strategies. The helper is a process/workflow controller, not an OS sandbox. CLI arguments take precedence when that argument supplies a value; consult `--help` and `normalize_request()` for the exact current request handling.
-
 | Parent decides | Helper enforces | Parent receives |
 | --- | --- | --- |
-| Task and repository | Path validation and workspace lock | Selected workspace and artifact paths |
-| Executor and quality mode | Tests/review policy and subprocess lifecycle | Results, findings and attempt records |
-| Timeout and fixup budget | Bounded retries and cleanup | `passed` or a follow-up/escalation signal |
-| What to do with the diff | No automatic push, merge or deployment | A small brief with details available on disk |
+| Task & repository | Path safety checks, Git HEAD check, and workspace lock | Selected workspace & artifact paths |
+| Executor & `quality_mode` | Test runner, tiered step/final review, subprocess group tracking | Structured findings, test status & attempt count |
+| Timeout & fixup budget | Bounded fixup rounds + full process-group cleanup on exit | `passed` or an explicit `needs_escalation` circuit-breaker signal |
+| What to do with the diff | Never auto-pushes, merges, or deploys | ~320-token `stdout` brief + section-addressable `handoff.json` on disk |
 
 ## Runtime Architecture
 
@@ -270,9 +267,9 @@ Prefer delegation for likely 3+ files, roughly 100+ changed/generated lines, non
 
 Use `quality_mode: fast` for medium work where pro should be rare. Use `quality_mode: safe` only when the final pro review is worth paying for.
 
-## Installation
+## Installation & Request Reference
 
-Clone the repository, then install the skill into Hermes:
+To install as a Hermes skill:
 
 ```bash
 mkdir -p ~/.hermes/skills/devops
@@ -280,55 +277,19 @@ cp -R . ~/.hermes/skills/devops/delegate-coding-cli
 chmod +x ~/.hermes/skills/devops/delegate-coding-cli/scripts/delegate_coding_cli.py
 ```
 
-Requirements:
+Requirements: **Python 3**, **Git**, and at least one configured executor (**Gemini CLI** and/or **Codex CLI**).
 
-- Python 3
-- Git
-- Gemini CLI and/or Codex CLI
+Key request fields for `--request-json`:
 
-At least one executor must be available.
-
-## Usage
-
-Create a request JSON file:
-
-```json
-{
-  "repo": "/path/to/repo",
-  "task": "Fix the login loading state after authentication failure.",
-  "executor": "auto",
-  "mode": "implement",
-  "quality_mode": "auto",
-  "review": "auto",
-  "stdout_mode": "brief",
-  "workspace_mode": "direct"
-}
-```
-
-Run the helper:
-
-```bash
-python3 -B scripts/delegate_coding_cli.py --request-json /tmp/delegate-request.json
-```
-
-`stdout_mode` controls only the final stdout payload:
-
-| Value | Output |
-|:--|:--|
-| `brief` | Minimal orchestrator JSON. Default and recommended. |
-| `summary` | Compact run summary without full handoff or executor payloads. |
-| `full` | Verbose legacy summary for debugging. |
-
-Useful request fields:
-
-| Field | Values |
-|:--|:--|
-| `mode` | `plan`, `implement`, `review` |
-| `executor` | `auto`, `gemini`, `codex` |
-| `quality_mode` | `auto`, `fast`, `safe` |
-| `workspace_mode` | `direct`, `worktree`, `copy` |
-| `review` | `auto`, `always`, `never` |
-| `max_fixup_rounds` | Non-negative integer |
+| Field | Values | Notes |
+|:--|:--|:--|
+| `mode` | `plan`, `implement`, `review` | `plan` and `review` run read-only; `implement` permits workspace edits |
+| `executor` | `auto`, `gemini`, `codex` | Defaults to `gemini` (`gemini-3-flash-preview`); `codex` uses `gpt-5.4-mini` |
+| `quality_mode` | `auto`, `fast`, `safe` | Resolved once per run to control step/final review depth |
+| `workspace_mode` | `direct`, `worktree`, `copy` | `direct` requires a Git repo with `HEAD`; `worktree` and `copy` isolate changes |
+| `review` | `auto`, `always`, `never` | Strict enum—use `"never"` (not `"none"` or `"off"`) to skip review |
+| `stdout_mode` | `brief`, `summary`, `full` | Keep `brief` (default) for orchestrators; `full` is for manual debugging |
+| `max_fixup_rounds` | Non-negative integer | Max self-repair rounds before halting with `needs_escalation` |
 
 ## Portability
 

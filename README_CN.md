@@ -14,15 +14,13 @@
 
 </div>
 
-Loop Warden 是一个 Hermes skill 和本地 Python helper，用来把仓库内的编码任务委派给 Gemini CLI、Codex CLI 这类 AI 编码 CLI。
+把顶层 Agent（比如 Hermes）和本地编码 CLI（`gemini`、`codex`）接在一起跑多步任务时，最容易栽在三件很具体、很烦人的工程破事上：
 
-它围绕一个核心原则设计：
+1. **僵尸子进程**：子 CLI 卡在管道或者超时被掐掉后，它拉起的整串子进程组还留在后台吃资源。
+2. **上下文爆炸**：子任务跑完把完整的实现日志、测试输出和 Review Diff 一股脑全打回 `stdout`，一轮就吃掉主 Agent 七八千 token。
+3. **弱模型死循环**：轻量模型在同一个 Review 问题上反复改、反复挂，把重试额度烧光，而上层 Agent 根本不知道该什么时候接管。
 
-**Orchestrator 负责决定任务边界，helper 负责执行循环。**
-
-也就是说，昂贵的父级 agent 不应该盯着每一次实现、测试、review、重试和清理。helper 在本地跑一个有边界的流程，写入结构化产物，并返回一个很小的 JSON brief，方便父级 orchestrator 低成本解析。
-
-适合搭建本地编码智能体工作流、希望复用实现—审核—修复循环的开发者。先[查看 CLI 参数](#先看边界再运行委派)，无需启动模型；再按[任务契约](#先有任务契约再启动执行器)接入真实编码任务。
+**Loop Warden**（`delegate_coding_cli.py`）就是从我日常的 Hermes 编码工作流里抽出来的本地“督工”脚本：**父级 Orchestrator 只负责定下任务契约和边界，这个 helper 负责把“实现 → 跑测 → Review → 有限轮修复”的机械闭环跑完**。跑完（或触及熔断上限）后，它在 `stdout` 只吐一份约 320 token 的 JSON 简报，把大体积日志全留在磁盘目录里按需翻阅。
 
 ## 先看边界，再运行委派
 
@@ -30,15 +28,16 @@ Loop Warden 是一个 Hermes skill 和本地 Python helper，用来把仓库内�
 git clone https://github.com/dubianche123/coding-agent-supervisor.git
 cd coding-agent-supervisor
 python3 -B scripts/delegate_coding_cli.py --help
+python3 -B scripts/delegate_coding_cli.py --check-health
 ```
 
-`--help` 仅查看入口参数，不启动执行器。实际委派需要已配置的 Gemini CLI 或 Codex CLI，并会在所选工作区执行代码任务。请求格式、质量模式和产物路径见后文。
+`--help` 用来查看 CLI 契约，`--check-health` 用来检查当前活跃子进程数和工作区锁，都不会启动任何大模型。
 
 ## 先有任务契约，再启动执行器
 
-有用的委派不只是一句任务描述，还需要具体仓库、工作区策略、执行器、审核方式与停止边界。父编排者提供这些选择，辅助程序执行机械循环，并报告完成情况或边界耗尽原因。
+靠谱的委派不能只传一句模糊的自然语言，而是要先定好契约：目标仓库路径、工作区隔离方式（`direct`、`worktree` 或 `copy`）、执行器（`gemini` 或 `codex`）、质量档位（`auto`、`fast` 或 `safe`）以及最多允许自修复几轮（`max_fixup_rounds`）。
 
-例如，将以下内容保存为 `/tmp/delegate-request.json`，把仓库路径换成自己的任务工作区：
+将下面的内容保存为 `/tmp/delegate-request.json`（把 `repo` 换成至少有一次 Git 提交的本地仓库路径）：
 
 ```json
 {
@@ -58,14 +57,12 @@ python3 -B scripts/delegate_coding_cli.py --help
 python3 -B scripts/delegate_coding_cli.py --request-json /tmp/delegate-request.json
 ```
 
-这会启动真实代码修改与配置的模型调用。`direct` 修改传入仓库；`worktree` 和 `copy` 提供其他工作区策略。它是进程/工作流控制器，不是操作系统沙箱。某个 CLI 参数提供值时会优先采用；当前精确处理规则见 `--help` 与 `normalize_request()`。
-
-| 父编排者决定 | 辅助程序约束 | 上层收到什么 |
+| 父编排者决定 | 辅助程序强制执行 | 上层收到什么 |
 | --- | --- | --- |
-| 任务与仓库 | 路径校验与工作区锁 | 实际工作区与产物路径 |
-| 执行器与质量模式 | 测试/审核策略与子进程生命周期 | 结果、问题与尝试记录 |
-| 超时与修复预算 | 有界重试与清理 | `passed` 或后续处理/升级信号 |
-| 如何处理差异 | 不自动推送、合并或部署 | 精简摘要，磁盘上保留完整细节 |
+| 任务与目标仓库 | 路径安全校验、Git HEAD 检查与工作区互斥锁 | 实际工作区与产物目录路径 |
+| 执行器与 `quality_mode` | 自动跑测、分级 Step/Final Review、子进程组追踪 | 结构化问题列表、测试结果与尝试轮数 |
+| 超时与修复轮数上限 | 有限轮自修复 + 退出/超时自动回收进程组 | `passed` 或明确的 `needs_escalation` 升级信号 |
+| 怎么处理代码 Diff | 绝不自动 push、merge 或部署 | 约 320 token 的 `stdout` 简报 + 磁盘上可按段落读取的 `handoff.json` |
 
 ## 运行时架构
 
@@ -270,9 +267,9 @@ delegation 不是免费的。只有当实现和 review 节省下来的上下文�
 
 中等任务用 `quality_mode: fast`，让 pro 尽量少出现。只有 final pro review 确实值得付费时，才用 `quality_mode: safe`。
 
-## 安装
+## 安装与请求字段参考
 
-克隆仓库后，把 skill 安装到 Hermes：
+把 skill 安装到 Hermes：
 
 ```bash
 mkdir -p ~/.hermes/skills/devops
@@ -280,55 +277,19 @@ cp -R . ~/.hermes/skills/devops/delegate-coding-cli
 chmod +x ~/.hermes/skills/devops/delegate-coding-cli/scripts/delegate_coding_cli.py
 ```
 
-依赖：
+运行依赖：**Python 3**、**Git**，以及至少一个已配置的执行器（**Gemini CLI** 和/或 **Codex CLI**）。
 
-- Python 3
-- Git
-- Gemini CLI 和/或 Codex CLI
+`--request-json` 核心字段说明：
 
-至少需要一个 executor 可用。
-
-## 使用
-
-创建 request JSON：
-
-```json
-{
-  "repo": "/path/to/repo",
-  "task": "修复登录失败后没有清理 loading 状态的问题",
-  "executor": "auto",
-  "mode": "implement",
-  "quality_mode": "auto",
-  "review": "auto",
-  "stdout_mode": "brief",
-  "workspace_mode": "direct"
-}
-```
-
-运行 helper：
-
-```bash
-python3 -B scripts/delegate_coding_cli.py --request-json /tmp/delegate-request.json
-```
-
-`stdout_mode` 只控制最终 stdout payload：
-
-| 取值 | 输出 |
-|:--|:--|
-| `brief` | 最小 orchestrator JSON，默认且推荐 |
-| `summary` | 紧凑运行摘要，不包含完整 handoff 或 executor payload |
-| `full` | 旧版详细 summary，仅建议调试使用 |
-
-常用 request 字段：
-
-| 字段 | 取值 |
-|:--|:--|
-| `mode` | `plan`, `implement`, `review` |
-| `executor` | `auto`, `gemini`, `codex` |
-| `quality_mode` | `auto`, `fast`, `safe` |
-| `workspace_mode` | `direct`, `worktree`, `copy` |
-| `review` | `auto`, `always`, `never` |
-| `max_fixup_rounds` | 非负整数 |
+| 字段 | 可选值 | 说明 |
+|:--|:--|:--|
+| `mode` | `plan`, `implement`, `review` | `plan` 与 `review` 只读；`implement` 允许修改工作区代码 |
+| `executor` | `auto`, `gemini`, `codex` | 默认 `gemini`（`gemini-3-flash-preview`）；`codex` 默认使用 `gpt-5.4-mini` |
+| `quality_mode` | `auto`, `fast`, `safe` | 每次运行一次性解析，决定 Step Review 与 Final Review 的深度 |
+| `workspace_mode` | `direct`, `worktree`, `copy` | `direct` 要求目标目录是已有 `HEAD` 提交的 Git 仓库；`worktree` 与 `copy` 提供隔离工作区 |
+| `review` | `auto`, `always`, `never` | 严格枚举——跳过审核请传 `"never"`（传 `"none"` 或 `"off"` 会直接报错拒绝） |
+| `stdout_mode` | `brief`, `summary`, `full` | 给上层 Agent 消费请保持默认 `brief`；`full` 仅用于人工排障 |
+| `max_fixup_rounds` | 非负整数 | 允许内部自修复的最大轮数，超限后触发熔断并返回 `needs_escalation` |
 
 ## 可平移性
 
